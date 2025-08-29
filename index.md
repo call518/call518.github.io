@@ -4,12 +4,17 @@ title: call518.github.io
 
 # call518.github.io (JungJungIn)
 
-[내 저장소](https://github.com/call518)들 중 **GitHub Pages**가 켜진 사이트 목록
+GitHub: [call518.github.io](https://github.com/call518)
+
+(forked 제외, 내가 만든 **모든 저장소** 목록)
+
+- 🌐 = GitHub Pages로 이동
+- 📦 = GitHub 저장소로 이동
 
 <div id="pages-list">로딩 중…</div>
 
 <style>
-  /* 게시판(세로 3줄) 스타일 */
+  /* 저장소당 3줄(제목/설명/업데이트) */
   ul.repo-list { list-style: none; padding: 0; margin: 16px 0; }
   ul.repo-list li { padding: 14px 8px; border-bottom: 1px solid #e5e7eb; }
   ul.repo-list li:last-child { border-bottom: none; }
@@ -18,6 +23,7 @@ title: call518.github.io
   .repo-title a:hover { text-decoration: underline; }
   .repo-desc { font-size: .95rem; color: #374151; margin-top: 4px; white-space: normal; word-break: break-word; }
   .repo-meta { font-size: .88rem; color: #6b7280; margin-top: 4px; }
+  .tag { font-size: .78rem; padding: 2px 6px; border: 1px solid #e5e7eb; border-radius: 9999px; margin-left: 6px; }
 </style>
 
 <script>
@@ -33,23 +39,30 @@ title: call518.github.io
 
     const repos = await resp.json();
 
-    // 조건: Pages 활성 + 메인 저장소 제외 + 아카이브 제외 + 포크 제외
-    const pagesRepos = repos
-      .filter(r => r.has_pages && r.name !== `${username}.github.io`)
-      .filter(r => !r.archived)
-      .filter(r => !r.fork) // ← 포크 제외
+    // 조건: 포크 제외 + call518.github.io 제외
+    const myRepos = repos
+      .filter(r => !r.fork)
+      .filter(r => r.name !== `${username}.github.io`)
       .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
 
-    if (pagesRepos.length === 0) {
-      target.textContent = "표시할 GitHub Pages 사이트가 없습니다.";
+    if (myRepos.length === 0) {
+      target.textContent = "표시할 저장소가 없습니다.";
       return;
     }
 
     const ul = document.createElement("ul");
     ul.className = "repo-list";
 
-    for (const r of pagesRepos) {
-      const defaultUrl = `https://${username}.github.io/${r.name}`; // 항상 Pages 기본 URL
+    for (const r of myRepos) {
+      // 링크 결정: has_pages면 Pages URL, 아니면 GitHub repo URL
+      let url;
+      if (r.has_pages) {
+        url = `https://${username}.github.io/${r.name}`;
+      } else {
+        url = r.html_url; // https://github.com/<user>/<repo>
+      }
+
+      const emoji = r.has_pages ? "🌐" : "📦";
       const lastPush = new Date(r.pushed_at).toLocaleString('ko-KR', {
         year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit'
@@ -57,7 +70,10 @@ title: call518.github.io
 
       const li = document.createElement("li");
       li.innerHTML = `
-        <div class="repo-title"><a href="${defaultUrl}" target="_blank" rel="noopener">${r.name}</a></div>
+        <div class="repo-title">
+          ${emoji} <a href="${url}" target="_blank" rel="noopener">${r.name}</a>
+          ${r.archived ? '<span class="tag">archived</span>' : ''}
+        </div>
         <div class="repo-desc">${r.description ? r.description : "No description"}</div>
         <div class="repo-meta">마지막 업데이트: ${lastPush}</div>
       `;
