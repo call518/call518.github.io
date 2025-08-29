@@ -4,7 +4,7 @@ title: call518.github.io
 
 # call518.github.io (JungJungIn)
 
-GitHub: [call518.github.io](https://github.com/call518)
+GitHub: [https://github.com/call518](https://github.com/call518)
 
 ## List of Repositories (forked 제외)
 
