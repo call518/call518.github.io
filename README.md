@@ -1,3 +1,1 @@
-# call518.github.io (JungJungIn)
-
-[call518's GitHub](https://github.com/call518)
+# [call518.github.io (JungJungIn)](https://github.com/call518)
