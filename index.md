@@ -46,7 +46,9 @@ title: call518.github.io
       // 기본 URL 규칙: https://<user>.github.io/<repo>
       // (홈페이지 필드가 있으면 그걸 우선 사용)
       const defaultUrl = `https://${username}.github.io/${r.name}`;
-      const url = r.homepage && r.homepage.trim() ? r.homepage : defaultUrl;
+      
+      //const url = r.homepage && r.homepage.trim() ? r.homepage : defaultUrl; // 'link' of 'about'
+      const url = defaultUrl; // https://<username>.github.io/<repo>
 
       const card = document.createElement("div");
       card.className = "card";
