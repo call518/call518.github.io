@@ -6,7 +6,7 @@ title: call518.github.io
 
 GitHub: [call518.github.io](https://github.com/call518)
 
-(forked 제외, 내가 만든 **모든 저장소** 목록)
+## 저장소 목록. (forked 제외)
 
 - 🌐 = GitHub Pages로 이동
 - 📦 = GitHub 저장소로 이동
