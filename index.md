@@ -9,10 +9,21 @@ title: call518.github.io
 <div id="pages-list">로딩 중…</div>
 
 <style>
-  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:16px; margin: 16px 0; }
-  .card { border:1px solid #e5e7eb; border-radius:12px; padding:14px; }
-  .card h3 { margin:0 0 8px 0; font-size:1.05rem; }
-  .meta { font-size:.9rem; color:#6b7280; }
+  /* 리스트(게시판) 스타일 */
+  ul.repo-list { list-style: none; padding: 0; margin: 16px 0; }
+  ul.repo-list li { display: flex; flex-direction: column; gap: 4px; padding: 12px 8px; border-bottom: 1px solid #e5e7eb; }
+  ul.repo-list li:last-child { border-bottom: none; }
+  .repo-title { font-weight: 700; font-size: 1.05rem; }
+  .repo-title a { text-decoration: none; }
+  .repo-title a:hover { text-decoration: underline; }
+  .meta { font-size: .9rem; color: #6b7280; }
+  /* 좁은 화면에서도 가독성 유지 */
+  @media (min-width: 720px) {
+    ul.repo-list li { flex-direction: row; align-items: baseline; gap: 16px; }
+    .repo-title { min-width: 320px; }
+    .repo-desc  { flex: 1; }
+    .repo-more  { white-space: nowrap; }
+  }
 </style>
 
 <script>
@@ -28,41 +39,40 @@ title: call518.github.io
 
     const repos = await resp.json();
 
-    // has_pages=true 이고, 사용자 페이지 저장소(call518.github.io)는 제외
+    // has_pages=true & 사용자 메인 저장소 제외
     const pagesRepos = repos
       .filter(r => r.has_pages && r.name !== `${username}.github.io`)
-      .filter(r => !r.archived) // 보통 아카이브 제외
-      .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at)); // 최근 업데이트 순
+      .filter(r => !r.archived)
+      .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at));
 
     if (pagesRepos.length === 0) {
       target.textContent = "표시할 GitHub Pages 사이트가 없습니다.";
       return;
     }
 
-    const grid = document.createElement("div");
-    grid.className = "grid";
+    const ul = document.createElement("ul");
+    ul.className = "repo-list";
 
     for (const r of pagesRepos) {
-      // 기본 URL 규칙: https://<user>.github.io/<repo>
-      // (홈페이지 필드가 있으면 그걸 우선 사용)
-      const defaultUrl = `https://${username}.github.io/${r.name}`;
-      
-      //const url = r.homepage && r.homepage.trim() ? r.homepage : defaultUrl; // 'link' of 'about'
-      const url = defaultUrl; // https://<username>.github.io/<repo>
+      const defaultUrl = `https://${username}.github.io/${r.name}`; // 항상 Pages 기본 URL 사용
+      const lastPush = new Date(r.pushed_at).toLocaleString('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      });
 
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <h3><a href="${url}">${r.name}</a></h3>
-        <div class="meta">${r.description ? r.description : "No description"}</div>
-        <div class="meta">Last push: ${new Date(r.pushed_at).toLocaleString()}</div>
-        <div class="meta">Default branch: ${r.default_branch}</div>
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="repo-title">
+          <a href="${defaultUrl}" target="_blank" rel="noopener">${r.name}</a>
+        </div>
+        <div class="repo-desc meta">${r.description ? r.description : "No description"}</div>
+        <div class="repo-more meta">마지막 업데이트: ${lastPush} · 기본 브랜치: ${r.default_branch}</div>
       `;
-      grid.appendChild(card);
+      ul.appendChild(li);
     }
 
     target.innerHTML = "";
-    target.appendChild(grid);
+    target.appendChild(ul);
   } catch (e) {
     console.error(e);
     target.textContent = "목록 로딩 중 오류가 발생했습니다. 잠시 후 다시 시도하세요.";
